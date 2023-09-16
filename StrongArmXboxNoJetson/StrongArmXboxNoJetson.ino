@@ -40,15 +40,18 @@ volatile int state [3];
 // Storing encoder values
 float encoderPos[3];              // units of encoder steps
 
-// Booleans to control each component, will be controlled by jetson
-volatile bool hand_move = 0;
-volatile bool hand_dir = 1;
-volatile bool spin_move = 0;
-volatile bool spin_dir = 1;
-volatile bool elbow_move = 0;
-volatile bool elbow_dir = 1;
-volatile bool shoulder_move = 0;
-volatile bool shoulder_dir = 1;
+// Movement and Direction Array (1 if move, 0 if don't move):
+// Position 0: Hand, 
+//          1: 
+//          2:
+//          3:
+//          4:
+//          5:
+//          6:
+//          7: Shoulder, Dir
+//          8: Shoulder, CCW movement
+move[8] = [0,0,0,0,0,0,0,0];
+dir[8] = [0,0,0,0,0,0,0,0];
 
 void setup() {  
   // Setup for wrist spin servo
@@ -93,18 +96,8 @@ ISR(TIMER1_OVF_vect) {        // ISR to pulse pins of moving motors
 
   // HAND CONTINUOUS ISR
   hand_angle = encoderPos[0]/45.51111;
-  if (hand_move = 1) { // if directed to move
-    if (hand_angle < 80) {
-      hand_movement(hand_move, hand_dir)
-    } else {
-      hand_servo.write(92); // stop servo 
-    }
-  } else { // if not directed to move
-    hand_servo.write(92);
-  }
 
   // WRIST SPIN ISR
-
 
   // ELBOW  ISR
   elbow_angle = encoderPos[1]/45.51111;
@@ -119,17 +112,9 @@ void loop() {
 
 }
 
-void elbow_movement(int elbow_encoder_val, bool elbow_move, bool elbow_dir) {
+void elbow_movement(float elbow_encoder_val, bool elbow_move, bool elbow_dir) {
   // Direction is 1 to move inward (towards 135), 0 to move outward (towards 0)
-  if (elbow_encoder_val > 0 && elbow_encoder_val < 135) {
-    if (elbow_move) {
-      if (elbow_dir == 1) {
-        digitalWrite(elbow_pul, HIGH);
-      } else {
-        digitalWrite(elbow_pul, LOW);
-      }
-    }
-  }
+
 }
 
 // Probably do not need encoder for the wrist spin, although wires wrapping around the upper
@@ -148,17 +133,23 @@ void wrist_spin_movement(bool spin_move, bool spin_dir) {
 }
 
 // angle limits - 0 to 80
-void hand_movement(bool hand_move, bool hand_dir) {
+void hand_movement(float hand_encoder_val, bool hand_move, bool hand_dir) {
   if (hand_move) {
-
+    if (hand_dir == 1) and (hand_encoder_val < 85) {
+      hand_servo.write(22); // close hand 
+    } else if (hand_dir == 0) and (hand_encoder_val > 0) {
+      hand_servo.write(132); // open hand
+    } else {
+      hand_servo.write(92); // stop if encoder val not satis
+    }
   } else {
-    hand_servo.write(92);
+    hand_servo.write(92); // stop
   }
 }
 
-//
+// 
 void shoulder_movement(bool shoulder_move, bool shoulder_dir) {
-
+  
 }
 
 // Call this function to reset the encoder's zero position to be the current position of the motor
