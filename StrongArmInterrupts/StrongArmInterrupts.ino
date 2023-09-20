@@ -23,9 +23,8 @@ int k;
 
 // Create Servo object to control wrist spin
 Servo spin_servo;
-volatile int spin_pos;
-volatile int spin_desired_pos;
-volatile bool spin_at_desired; // True means at desired, False means not at desired 
+volatile int spin_wait = 0;
+volatile int spin_target = 0;
 
 // Create continuous Servo object to control the hand 
 Servo hand_servo;
@@ -70,8 +69,6 @@ void setup() {
   // SERVOS
   // Setup for servo that controls wrist spin 
   spin_servo.attach(6);
-  spin_desired_pos = 0;
-  spin_at_desired = false;
 
   // Setup for the servo that controls the hand 
   hand_servo.attach(5);
