@@ -27,6 +27,7 @@ int c1 = 4;     // chip select pin - useful
 volatile int fill_serial_buffer = false;
 volatile int servo_wait = 0;
 volatile int cont_wait = 0;
+volatile int elbow_wait = 0;
 
 // Storing pins and states for the stepper motor (index 0) and continuous Servo (index 1)
 MovingSteppersLib motors[2] {{s0,d0,c0}, {s1,d1,c1}};     
@@ -56,11 +57,11 @@ void setup() {
   spin_desired_pos = 0;
 
   // Elbow stepper motor setup
-  targetAngle[0] = 0;   // max is roughly 135 if zeroed correctly
+  targetAngle[0] = 90;   // max is roughly 125 if zeroed correctly
   pinMode(directionPin[0], OUTPUT);
   pinMode(stepPin[0], OUTPUT);
   encoderTarget[0] = targetAngle[0] * 45.51111; // * 360/255;
-  encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
+  encoderPos[0] = motors[0].encoder.getPositionSPI(14);
   encoderDiff[0] = encoderTarget[0] - encoderPos[0];
   move[0] = 1; 
   
@@ -68,7 +69,7 @@ void setup() {
   hand_servo.attach(5);
   targetAngle[1] = 1;   // Hand encoder setup: 80 is closed and 1 is open
   encoderTarget[1] = targetAngle[1] * 45.51111;
-  encoderPos[1] = motors[1].encoder.getPositionSPI(c1);
+  encoderPos[1] = motors[1].encoder.getPositionSPI(14);
   encoderDiff[1] = encoderTarget[1] - encoderPos[1];
   move[1] = 1; 
 
@@ -90,16 +91,20 @@ void setup() {
 ISR(TIMER1_OVF_vect) {        // ISR to pulse pins of moving motors
   TCNT1 = 65518;              // preload timer to 300 us          
   fill_serial_buffer = true;  // check
-  
+
   // ELBOW STEPPER ISR
-  not_tolerant_elbow = abs(encoderDiff[0]) > 10 && ((abs(encoderDiff[0]) + 10) < (MAX_ENCODER_VAL + encoderTarget[0])); // 2nd condition to check if 359 degrees is close enough to 0
-  if (move[0]) {                            // if motor should move
-    if (not_tolerant_elbow) {               // if not within tolerance
-      state[0] = !state[0];                 // toggle state
-      digitalWrite(stepPin[0], state[0]);   // write to step pin
-    } else {
-      move[0] = 0;    // stop moving motor if location reached
+  elbow_wait += 1;
+  if (elbow_wait == 5) {
+    not_tolerant_elbow = abs(encoderDiff[0]) > 10 && ((abs(encoderDiff[0]) + 10) < (MAX_ENCODER_VAL + encoderTarget[0])); // 2nd condition to check if 359 degrees is close enough to 0
+    if (move[0]) {                            // if motor should move
+      if (not_tolerant_elbow) {               // if not within tolerance
+        state[0] = !state[0];                 // toggle state
+        digitalWrite(stepPin[0], state[0]);   // write to step pin
+      } else {
+        move[0] = 0;    // stop moving motor if location reached
+      }
     }
+    elbow_wait = 0;
   }
   
   // HAND CONTINUOUS ISR

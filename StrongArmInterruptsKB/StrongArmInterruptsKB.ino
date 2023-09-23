@@ -159,23 +159,51 @@ void update_encoder_angles() {
 }
 
 void changeAngles(uint16_t data[]) {
-    if (targetAngle[0] != data[0]) {
-      targetAngle[0] = data[0];
+    //Serial.println(data[0]);
+    Serial.println(encoderPos[0]/45.1111);
+
+    // ELBOW KB CONTROL
+    if (data[0] == 0) { 
+      move[0] = 0;                                               
+    } else if (data[0] == 1) {
+      targetAngle[0] = 120;
       encoderTarget[0] = targetAngle[0] * 45.51111; // * 360/255;
       encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
       encoderDiff[0] = encoderTarget[0] - encoderPos[0];
-      move[0] = 1;                                                    
+      move[0] = 1;  
+    } else if (data[0] == 2) {
+      targetAngle[0] = 0;
+      encoderTarget[0] = targetAngle[0] * 45.51111; // * 360/255;
+      encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
+      encoderDiff[0] = encoderTarget[0] - encoderPos[0];
+      move[0] = 1;  
     }
 
-    // spin_servo.attach(7);
-    // spin_desired_pos = data[1];
+    // if (targetAngle[1] != data[2]) {
+    //   targetAngle[1] = data[2];
+    //   encoderTarget[1] = targetAngle[1] * 45.51111;
+    //   encoderPos[1] = motors[1].encoder.getPositionSPI(c1);
+    //   encoderDiff[1] = encoderTarget[1] - encoderPos[1];
+    //   move[1] = 1;                                                    
+    // }
 
-    if (targetAngle[1] != data[2]) {
-      targetAngle[1] = data[2];
-      encoderTarget[1] = targetAngle[1] * 45.51111;
-      encoderPos[1] = motors[1].encoder.getPositionSPI(c1);
-      encoderDiff[1] = encoderTarget[1] - encoderPos[1];
-      move[1] = 1;                                                    
+    // SPIN KB CONTROL
+    if (data[1] == 0) { // STOP 
+      spin_servo.write(92);                                           
+    } else if (data[1] == 1) { // CW?
+      spin_servo.write(150);
+    } else if (data[1] == 2) { // CCW
+      spin_servo.write(30); 
+    }
+
+    // HAND KB CONTROL
+    if (data[2] == 0) { 
+      move[1] = 0;
+      hand_servo.write(92);                                               
+    } else if (data[2] == 1) {
+      hand_servo.write(150);
+    } else if (data[2] == 2) {
+      hand_servo.write(30);  
     }
 }
 
