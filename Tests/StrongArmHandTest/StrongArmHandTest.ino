@@ -38,7 +38,7 @@ void setup() {
   hand_servo.attach(5);
   targetAngle[0] = 1;   // Hand encoder setup: 80 is closed and 1 is open
   encoderTarget[0] = targetAngle[0] * 45.51111;
-  encoderPos[0] = motors[0].encoder.getPositionSPI(c1);
+  encoderPos[0] = MAX_ENCODER_VAL - motors[0].encoder.getPositionSPI(c1);
   encoderDiff[0] = encoderTarget[0] - encoderPos[0];
   move[0] = 1; 
 
@@ -63,7 +63,7 @@ ISR(TIMER1_OVF_vect) {        // ISR to pulse pins of moving motors
   
   // HAND CONTINUOUS ISR
   cont_wait += 1;
-  if (cont_wait == 100) {
+  if (cont_wait == 50) {
     not_tolerant_hand = abs(encoderDiff[0]) > 10 && ((abs(encoderDiff[0]) + 10) < (MAX_ENCODER_VAL + encoderTarget[0]));
     if (move[0]) { 
       if (not_tolerant_hand) {    // move continuous servo

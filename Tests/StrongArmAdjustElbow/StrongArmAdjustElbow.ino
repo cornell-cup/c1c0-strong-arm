@@ -32,7 +32,6 @@ void loop() {
   // '2' --> bend in
   if (input == '0') {
     digitalWrite(s0, LOW);
-    digitalWrite(s0, LOW);
     motors[0].encoder.setZeroSPI(c0);
   } else if (input == '1') {  
     digitalWrite(d0, LOW);
