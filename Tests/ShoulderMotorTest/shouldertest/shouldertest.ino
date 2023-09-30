@@ -1,5 +1,5 @@
-#define driverPUL 8
-#define driverDIR 10
+#define driverPUL 11
+#define driverDIR 9
 
 void setup()
 {
@@ -13,9 +13,9 @@ void setup()
 
 void loop()
 {
-  //digitalWrite(driverDIR, LOW);
-  digitalWrite(driverPUL, LOW);
+  digitalWrite(driverDIR, LOW);
+  digitalWrite(driverPUL, HIGH);
   delay(1);
   digitalWrite(driverPUL, LOW);
-  delay(10);
+  delay(1);
 }

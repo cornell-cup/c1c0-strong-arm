@@ -37,16 +37,21 @@ int s1 = 30;    // step pin - useless
 int d1 = 31;    // direction pin - useless
 int c1 = 4;     // chip select pin - useful
 
+// Shoulder motor pins
+int s2 = 11;    // pulse/step pin
+int d2 = 9;     // direction pin
+
 volatile int fill_serial_buffer = false;
 volatile int cont_wait = 0;
 volatile int elbow_wait = 0;
+volatile int shoulder_wait = 0;
 
-// Storing pins and states for the stepper motor (index 0) and continuous Servo (index 1)
+// Storing pins and states for the elbow stepper motor (index 0), continuous Servo (index 1), and shoulder stepper motor (index 2)
 MovingSteppersLib motors[2] {{s0,d0,c0}, {s1,d1,c1}};     
-int stepPin[2] = {s0, s1}; 
-int directionPin[2] = {d0, d1};  
-volatile int move [2];              
-volatile int state [2];             
+int stepPin[3] = {s0, s1, s2}; 
+int directionPin[3] = {d0, d1, d2};  
+volatile int move [3];              
+volatile int state [3];             
 
 int reversed[1] = {0}; // helps elbow choose correct direction 
 
@@ -69,10 +74,8 @@ int shoulderData = 0;
 int minElbowAngle = 0;
 int maxElbowAngle = 120;
 
-int minHandPosition = 0;
-int maxHandPosition = 70;
-
-int handAngle = 0;
+int minHandPosition = 1;
+int maxHandPosition = 80;
 
 void setup() {
   Serial.begin(9600);   // Serial monitor
@@ -94,6 +97,12 @@ void setup() {
   pinMode(directionPin[0], OUTPUT);
   pinMode(stepPin[0], OUTPUT);
 
+  // Shoulder motor setup
+  pinMode(directionPin[2], OUTPUT);
+  pinMode(stepPin[2], OUTPUT);
+  digitalWrite(directionPin[2], LOW);
+  digitalWrite(stepPin[2], LOW);
+
   // ENCODERS - first bool for elbow encoder and second bool for hand (true = zero)
   redefine_encoder_zero_position(false, false);
 
@@ -112,7 +121,7 @@ void setup() {
 ISR(TIMER1_OVF_vect) {        // ISR to pulse pins of moving motors
   TCNT1 = 65518;              // preload timer to 300 us          
   fill_serial_buffer = true;  // check
-
+  
   // ELBOW STEPPER ISR
   elbow_wait += 1;
   if (elbow_wait == 3) {
@@ -141,6 +150,16 @@ ISR(TIMER1_OVF_vect) {        // ISR to pulse pins of moving motors
       }
     }
     cont_wait = 0;
+  }
+
+  // SHOULDER STEPPER ISR
+  shoulder_wait += 1;
+  if (shoulder_wait == 10) {
+    if (move[2]) {                            // if motor should move
+      state[2] = !state[2];                 // toggle state
+      digitalWrite(stepPin[2], state[2]);   // write to step pin
+    }
+    shoulder_wait = 0;
   }
 }
 
@@ -178,40 +197,46 @@ void controlMovement(uint16_t data[]) {
       encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
       encoderDiff[0] = encoderTarget[0] - encoderPos[0];
       move[0] = 1;                                                    
-    } else if (elbowData == 0) {
+    } else if (elbowData == 3) {
       move[0] = 0;
-      encoderPos[0] = motors[0].encoder.getPositionSPI(c0); 
     }
 
     if (spinData == 1) {
       spin_servo.write(162);
     } else if (spinData == 2) {
       spin_servo.write(22);
-    } else if (spinData == 0) {
+    } else if (spinData == 3) {
       spin_servo.write(92);
     }
 
-
-    handAngle = motors[1].encoder.getPositionSPI(c1)/45.51111;
-    Serial.println(handAngle);
-
     if (handData == 1) {
-      hand_servo.write(160);
-      // targetAngle[1] = minHandPosition;
-      // encoderTarget[1] = targetAngle[1] * 45.51111; // * 360/255;
-      // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
-      // encoderDiff[1] = encoderTarget[1] - encoderPos[1];
-      // move[1] = 1;                                                   
-    } else if (handData == 2) {
       hand_servo.write(20);
       // targetAngle[1] = maxHandPosition;
       // encoderTarget[1] = targetAngle[1] * 45.51111; // * 360/255;
       // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
       // encoderDiff[1] = encoderTarget[1] - encoderPos[1];
+      // move[1] = 1;                                                   
+    } else if (handData == 2) {
+      hand_servo.write(160);
+      // targetAngle[1] = minHandPosition;
+      // encoderTarget[1] = targetAngle[1] * 45.51111; // * 360/255;
+      // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
+      // encoderDiff[1] = encoderTarget[1] - encoderPos[1];
       // move[1] = 1;                                                    
-    } else if (handData == 0) {
-        hand_servo.write(92);
-        // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
+    } else if (handData == 3) {
+      // move[1] = 0;
+      // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
+      hand_servo.write(92);
+    }
+
+    if (shoulderData == 1) {
+      digitalWrite(directionPin[2], LOW);
+      move[2] = 1;
+    } else if (shoulderData == 2) {
+      digitalWrite(directionPin[2], HIGH);
+      move[2] = 1;
+    } else if (shoulderData == 3) {
+      move[2] = 0; 
     }
 }
 
@@ -238,7 +263,7 @@ void checkDirLongWay(int motorNum) {
 void cont_check_dir(int contNum) {
   // 92/93 - zero rotation
   encoderPos[contNum] = MAX_ENCODER_VAL - motors[contNum].encoder.getPositionSPI(c1);
-
+  
   if (encoderPos[contNum] == 65535){
     move[contNum] = 0;    // stop moving if encoder reads error message
   }
