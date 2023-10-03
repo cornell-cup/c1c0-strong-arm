@@ -13,11 +13,11 @@ ser = serial.Serial(
     baudrate = 38400
 )
 
-data = [0, 0, 0, 0] # data[elbow, spin, hand, shoulder]
-# Elbow:    0-stop,  1-in,    2-out
-# Spin:     0-stop,  1-CW,    2-CCW
-# Hand:     0-stop,  1-close, 2-open
-# Shoulder: 0-stop,  1-up,    2-down
+data = [3, 3, 3, 3] # data[elbow, spin, hand, shoulder]
+# Elbow:    3-stop,  1-in,    2-out
+# Spin:     3-stop,  1-CW,    2-CCW
+# Hand:     3-stop,  1-close, 2-open
+# Shoulder: 3-stop,  1-up,    2-down
 
 def convert_8_to_16(msg, length):
     data = []
@@ -39,22 +39,22 @@ while(True):
     # Elbow control (w/g)
     if kb.is_pressed('w'): data[0] = 1    # Move elbow in
     elif kb.is_pressed('s'): data[0] = 2  # Move elbow out
-    else: data[0] = 0
+    else: data[0] = 3
 
     # Wrist control (e/d)
     if kb.is_pressed('e'): data[1] = 1    # Spin wrist CW      
     elif kb.is_pressed('d'): data[1] = 2  # Spin wrist CCW
-    else: data[1] = 0
+    else: data[1] = 3
 
     # Hand control (r/f)
     if kb.is_pressed('r'): data[2] = 1    # Close hand
     elif kb.is_pressed('f'): data[2] = 2  # Open hand
-    else: data[2] = 0
+    else: data[2] = 3
 
     # Shoulder control (q/a)
     if kb.is_pressed('q'): data[3] = 1    # Move shoulder up
     elif kb.is_pressed('a'): data[3] = 2  # Move shoulder down
-    else: data[3] = 0
+    else: data[3] = 3
     
     print("Sent message: " + str(data))
     time.sleep(.2)

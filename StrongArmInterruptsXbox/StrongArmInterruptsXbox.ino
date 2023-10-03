@@ -7,12 +7,12 @@
 
 // R2Protocol Definitions
 // Jetson to Arduino r2p decode constants
-uint8_t data_buffer[32];          // Set equal to 16 + 2 * length of angle array
-uint32_t data_buffer_len = 32;    
+uint8_t data_buffer[24];          // Set equal to 16 + 2 * length of angle array
+uint32_t data_buffer_len = 24;    
 uint16_t checksum; 
 char type[5];
-uint8_t data[16];               // Twice the length of the array
-uint16_t data_final[8];     
+uint8_t data[8];               // Twice the length of the array
+uint16_t data_final[4];     
 uint32_t data_len;
 
 // Arduino to Jetson R2
@@ -78,8 +78,8 @@ int minHandPosition = 1;
 int maxHandPosition = 80;
 
 void setup() {
-  Serial.begin(9600);   // Serial monitor
-  Serial1.begin(38400); // TX1/RX1 
+  Serial.begin(115200);   // Serial monitor
+  Serial1.begin(9600); // TX1/RX1 
   reset_input_buffer(); // Jetson to Arduino r2p decode setup (clears Serial monitor)
 
   // SERVOS
