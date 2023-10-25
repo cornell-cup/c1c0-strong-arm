@@ -24,7 +24,7 @@ void loop() {
   // '1' --> opens hand
   // '2' --> closes hand
   if (input == '0') {
-    spin_servo.write(93);
+    spin_servo.write(90);
   } else if (input == '1') {
     spin_servo.write(113);
   } else if (input == '2') {

@@ -9,11 +9,8 @@
 char input = 0;
 
 // Stepper motor (elbow) encoder
-int s0 = 8;     // step pin
-int d0 = 10;    // direction pin
-int c0 = 35;    // chip select pin 
-
-MovingSteppersLib motors[1] {{s0,d0,c0}};     
+int s0 = 11;     // step pin
+int d0 = 9;    // direction pin  
 
 void setup() {
   Serial.begin(9600);  
@@ -32,7 +29,6 @@ void loop() {
   // '2' --> bend in
   if (input == '0') {
     digitalWrite(s0, LOW);
-    motors[0].encoder.setZeroSPI(c0);
   } else if (input == '1') {  
     digitalWrite(d0, LOW);
     digitalWrite(s0, HIGH);

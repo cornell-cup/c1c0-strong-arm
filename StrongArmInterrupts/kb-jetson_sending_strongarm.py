@@ -10,7 +10,7 @@ import R2Protocol2 as r2p
 
 ser = serial.Serial(
     port = '/dev/ttyTHS1', # Jetson hardware serial port (pins 8/10 on header)
-    baudrate = 38400
+    baudrate = 9600
 )
 
 data = [3, 3, 3, 3] # data[elbow, spin, hand, shoulder]
