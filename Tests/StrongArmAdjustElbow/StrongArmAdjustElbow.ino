@@ -9,7 +9,7 @@
 char input = 0;
 
 // Stepper motor (elbow) encoder
-int s0 = 8;     // step pin
+int s0 = 4;     // step pin
 int d0 = 10;    // direction pin
 int c0 = 35;    // chip select pin 
 

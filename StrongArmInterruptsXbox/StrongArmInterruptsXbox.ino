@@ -28,7 +28,7 @@ volatile bool spin_at_desired; // True means at desired, False means not at desi
 Servo hand_servo;
 
 // Stepper motor (elbow) encoder
-int s0 = 8;     // step pin
+int s0 = 4;     // step pin
 int d0 = 10;    // direction pin
 int c0 = 35;    // chip select pin (had this on 5, changing for now)
 
@@ -39,7 +39,7 @@ int c1 = 4;     // chip select pin - useful
 
 // Shoulder motor pins
 int s2 = 11;    // pulse/step pin
-int d2 = 9;     // direction pin
+int d2 = 5;     // direction pin
 
 volatile int fill_serial_buffer = false;
 volatile int cont_wait = 0;
@@ -84,13 +84,13 @@ void setup() {
 
   // SERVOS
   // Setup for servo that controls wrist spin 
-  spin_servo.attach(6);
+  spin_servo.attach(7);
   spin_servo.write(90);
   spin_desired_pos = 0;
   spin_at_desired = false;
 
   // Setup for the servo that controls the hand 
-  hand_servo.attach(5);
+  hand_servo.attach(6);
   targetAngle[1] = 1;   // Hand encoder setup: 80 is closed and 1 is open
 
   // Elbow stepper motor setup

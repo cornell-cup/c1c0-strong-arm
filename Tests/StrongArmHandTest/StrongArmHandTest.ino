@@ -35,7 +35,7 @@ void setup() {
   Serial.begin(9600);   // Serial monitor
   
   // Setup for the servo that controls the hand 
-  hand_servo.attach(5);
+  hand_servo.attach(6);
   targetAngle[0] = 1;   // Hand encoder setup: 80 is closed and 1 is open
   encoderTarget[0] = targetAngle[0] * 45.51111;
   encoderPos[0] = MAX_ENCODER_VAL - motors[0].encoder.getPositionSPI(c1);

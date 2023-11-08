@@ -11,7 +11,7 @@ char input = 0;
 
 void setup() {
   Serial.begin(9600);     
-  spin_servo.attach(6);
+  spin_servo.attach(7);
 }
 
 void loop() {
