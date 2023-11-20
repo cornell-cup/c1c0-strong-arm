@@ -84,13 +84,14 @@ void setup() {
 
   // SERVOS
   // Setup for servo that controls wrist spin 
-  spin_servo.attach(7);
+  spin_servo.attach(2);
   spin_servo.write(90);
   spin_desired_pos = 0;
   spin_at_desired = false;
 
   // Setup for the servo that controls the hand 
-  hand_servo.attach(6);
+  hand_servo.attach(7);
+  hand_servo.write(90);
   targetAngle[1] = 1;   // Hand encoder setup: 80 is closed and 1 is open
 
   // Elbow stepper motor setup
@@ -123,20 +124,7 @@ ISR(TIMER1_OVF_vect) {        // ISR to pulse pins of moving motors
   TCNT1 = 65518;              // preload timer to 300 us          
   fill_serial_buffer = true;  // check
   
-  // ELBOW STEPPER ISR
-  // elbow_wait += 1;
-  // if (elbow_wait == 3) {
-  //   not_tolerant_elbow = abs(encoderDiff[0]) > 10 && ((abs(encoderDiff[0]) + 10) < (MAX_ENCODER_VAL + encoderTarget[0])); // 2nd condition to check if 359 degrees is close enough to 0
-  //   if (move[0]) {                            // if motor should move
-  //     if (not_tolerant_elbow) {               // if not within tolerance
-  //       state[0] = !state[0];                 // toggle state
-  //       digitalWrite(stepPin[0], state[0]);   // write to step pin
-  //     } else {
-  //       move[0] = 0;    // stop moving motor if location reached
-  //     }
-  //   }
-  //   elbow_wait = 0;
-  // }
+
   elbow_wait += 1;
   if (elbow_wait == 2) {
     if (move[0]) {                            // if motor should move
