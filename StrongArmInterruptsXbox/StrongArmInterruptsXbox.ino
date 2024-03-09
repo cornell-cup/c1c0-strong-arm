@@ -219,30 +219,21 @@ void controlMovement(uint16_t data[]) {
     }
 
     if (spinData == 1) {
+      spin_servo.attach(spinServoPin);
       spin_servo.write(22);
     } else if (spinData == 2) {
+      spin_servo.attach(spinServoPin);
       spin_servo.write(162);
     } else if (spinData == 3) {
+      spin_servo.detach();
       spin_servo.write(88);
     }
 
     if (handData == 1) {
-      hand_servo.write(20);
-      // targetAngle[1] = maxHandPosition;
-      // encoderTarget[1] = targetAngle[1] * 45.51111; // * 360/255;
-      // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
-      // encoderDiff[1] = encoderTarget[1] - encoderPos[1];
-      // move[1] = 1;                                                   
+      hand_servo.write(20);                                                 
     } else if (handData == 2) {
-      hand_servo.write(160);
-      // targetAngle[1] = minHandPosition;
-      // encoderTarget[1] = targetAngle[1] * 45.51111; // * 360/255;
-      // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
-      // encoderDiff[1] = encoderTarget[1] - encoderPos[1];
-      // move[1] = 1;                                                    
+      hand_servo.write(160);                                                
     } else if (handData == 3) {
-      // move[1] = 0;
-      // encoderPos[1] = MAX_ENCODER_VAL - motors[1].encoder.getPositionSPI(c1);
       hand_servo.write(92);
     }
 
