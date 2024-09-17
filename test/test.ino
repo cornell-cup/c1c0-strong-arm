@@ -12,6 +12,4 @@ void loop(){
   digitalWrite(PIN,HIGH);
   digitalWrite(PIN2,HIGH);
   //delay(2000);
-
-
 }

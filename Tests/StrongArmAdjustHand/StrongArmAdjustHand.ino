@@ -18,7 +18,8 @@ MovingSteppersLib motors[1] {{s1,d1,c1}};
 
 void setup() {
   Serial.begin(9600);     
-  hand_servo.attach(5);
+  hand_servo.attach(3);
+  Serial.print("start");
 }
 
 void loop() {
@@ -34,6 +35,7 @@ void loop() {
     hand_servo.write(93);
     motors[0].encoder.setZeroSPI(c1);
   } else if (input == '1') {
+    Serial.print("Bruh");
     hand_servo.write(113);
   } else if (input == '2') {
     hand_servo.write(73);

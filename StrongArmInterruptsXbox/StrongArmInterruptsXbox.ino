@@ -28,7 +28,7 @@ volatile bool spin_at_desired; // True means at desired, False means not at desi
 Servo hand_servo;
 
 // Stepper motor (elbow) encoder
-int s0 = 4;     // step pin
+int s0 = 4;    // step pin
 int d0 = 10;    // direction pin
 int c0 = 35;    // chip select pin (had this on 5, changing for now)
 int e0 = 8;
@@ -43,7 +43,7 @@ int c1 = 4;     // chip select pin - useful
 
 // Shoulder motor pins
 int s2 = 11;    // pulse/step pin
-int d2 = 5;     // direction pin
+int d2 = 12;     // direction pin
 int e2 = 9;
 
 volatile int fill_serial_buffer = false;
@@ -90,13 +90,13 @@ void setup() {
   // SERVOS
   // Setup for servo that controls wrist spin 
   spin_servo.attach(spinServoPin);
-  spin_servo.write(88);
+  spin_servo.write(89);
   spin_desired_pos = 0;
   spin_at_desired = false;
 
   // Setup for the servo that controls the hand 
   hand_servo.attach(handServoPin);
-  hand_servo.write(90);
+  hand_servo.write(92);
   targetAngle[1] = 1;   // Hand encoder setup: 80 is closed and 1 is open
 
   // Elbow stepper motor setup
@@ -189,32 +189,17 @@ void controlMovement(uint16_t data[]) {
     spinData = data[1];       // 0 = stop, 1 = CCW,  2 = CW 
     handData = data[2];       // 0 = stop, 1 = open, 2 = close
     shoulderData = data[3];   // 0 = stop, 1 = CCW,  2 = CW
-    if (elbowData == 1) {
-      // targetAngle[0] = maxElbowAngle;
-      // encoderTarget[0] = targetAngle[0] * 45.51111; // * 360/255;
-      // encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
-      // encoderDiff[0] = encoderTarget[0] - encoderPos[0];
-      // move[0] = 1;   
+
+    if (elbowData == 1) {  
       digitalWrite(directionPin[0], HIGH);
       digitalWrite(e0,LOW);
       move[0] = 1;                                                 
-    } else if (elbowData == 2) {
-      // targetAngle[0] = minElbowAngle;
-      // encoderTarget[0] = targetAngle[0] * 45.51111; // * 360/255;
-      // encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
-      // encoderDiff[0] = encoderTarget[0] - encoderPos[0];
-      // move[0] = 1;           
+    } else if (elbowData == 2) {           
       digitalWrite(directionPin[0], LOW);
       digitalWrite(e0,LOW);
       move[0] = 1;                                         
-    } else if (elbowData == 3) {
-      // targetAngle[0] = 0;
-      // encoderTarget[0] = targetAngle[0] * 45.51111; // * 360/255;
-      // encoderPos[0] = motors[0].encoder.getPositionSPI(c0);
-      // encoderDiff[0] = encoderTarget[0] - encoderPos[0];
-      // move[0] = 0; 
+    } else if (elbowData == 3) { 
       digitalWrite(e0,HIGH);
-
       move[0] = 0; 
     }
 
@@ -226,7 +211,7 @@ void controlMovement(uint16_t data[]) {
       spin_servo.write(162);
     } else if (spinData == 3) {
       spin_servo.detach();
-      spin_servo.write(88);
+      spin_servo.write(89);
     }
 
     if (handData == 1) {

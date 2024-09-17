@@ -10,7 +10,7 @@ char input = 0;
 
 // Stepper motor (elbow) encoder
 int s0 = 11;     // step pin
-int d0 = 5;    // direction pin  
+int d0 = 12;    // direction pin  
 
 void setup() {
   Serial.begin(9600);  
@@ -28,18 +28,25 @@ void loop() {
   // '1' --> bend out 
   // '2' --> bend in
   if (input == '0') {
+    Serial.println("0");
     digitalWrite(s0, LOW);
   } else if (input == '1') {  
-    digitalWrite(d0, LOW);
-    digitalWrite(s0, HIGH);
-    delay(1);
-    digitalWrite(s0, LOW);
-    delay(2);
+    while (input == '1') {
+      Serial.println("1");
+      digitalWrite(d0, LOW);
+      digitalWrite(s0, HIGH);
+      delay(1);
+      digitalWrite(s0, LOW);
+      delay(2);
+    }
   } else if (input == '2') {
-    digitalWrite(d0, HIGH);
-    digitalWrite(s0, HIGH);
-    delay(1);
-    digitalWrite(s0, LOW);
-    delay(2);
+    while (input == '2') {
+      Serial.println("2");
+      digitalWrite(d0, HIGH);
+      digitalWrite(s0, HIGH);
+      delay(1);
+      digitalWrite(s0, LOW);
+      delay(2);
+    }
   }
 }
